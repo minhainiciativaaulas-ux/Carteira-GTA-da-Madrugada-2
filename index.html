@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carteira GTA da Madrugada</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00D9FF;
+            --secondary: #0066CC;
+            --dark-bg: #0A0E27;
+            --accent: #FF6B00;
+            --text: #E5E7EB;
+            --grid: rgba(31, 41, 55, 0.5);
+            --green: #10B981;
+            --red: #EF4444;
+            --purple: #8B5CF6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #0A0E27 0%, #1a1f3a 50%, #0A0E27 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.1) 0%, transparent 70%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            margin-bottom: 1rem;
+            color: var(--text);
+            opacity: 0.9;
+        }
+
+        .tagline {
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            margin-bottom: 3rem;
+            color: var(--text);
+            opacity: 0.7;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 3rem;
+            background: var(--primary);
+            color: var(--dark-bg);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: 2px solid var(--primary);
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            background: transparent;
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.3);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .section {
+            margin-bottom: 6rem;
+        }
+
+        .section-title {
+            font-size: clamp(1.8rem, 3vw, 2.5rem);
+            margin-bottom: 1rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .section-description {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+
+        /* Chart Section */
+        .chart-container {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+        }
+
+        /* Sub Charts Grid */
+        .sub-charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .sub-chart-container {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 217, 255, 0.1);
+        }
+
+        .sub-chart-container h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .sub-chart-wrapper {
+            position: relative;
+            height: 250px;
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .kpi-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 217, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.2);
+        }
+
+        .kpi-label {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-trend {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .positive { color: var(--green); }
+        .negative { color: var(--red); }
+        .warning { color: var(--accent); }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            margin-top: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: rgba(0, 217, 255, 0.1);
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--grid);
+        }
+
+        tr:hover {
+            background: rgba(0, 217, 255, 0.05);
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-inicial { background: rgba(0, 102, 204, 0.3); color: var(--secondary); }
+        .status-crescimento { background: rgba(16, 185, 129, 0.3); color: var(--green); }
+        .status-queda { background: rgba(255, 107, 0, 0.3); color: var(--accent); }
+        .status-recuperacao { background: rgba(0, 217, 255, 0.3); color: var(--primary); }
+
+        /* Info Cards */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(0, 217, 255, 0.1);
+        }
+
+        .info-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--grid);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 1rem;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--green), var(--primary));
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark-bg);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .progress-fill.warning {
+            background: linear-gradient(90deg, var(--accent), var(--red));
+        }
+
+        /* Simulator */
+        .simulator {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            margin-top: 2rem;
+        }
+
+        .simulator-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .input-group input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .input-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+
+        .input-group input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: none;
+        }
+
+        .input-value {
+            margin-top: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .simulator-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .result-item {
+            background: rgba(0, 217, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Accordion */
+        .accordion {
+            margin-top: 2rem;
+        }
+
+        .accordion-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(0, 217, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .accordion-header:hover {
+            background: rgba(0, 217, 255, 0.05);
+        }
+
+        .accordion-header h3 {
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .accordion-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-item.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion-content-inner {
+            padding: 0 1.5rem 1.5rem;
+            line-height: 1.8;
+            opacity: 0.9;
+        }
+
+        .accordion-item.active .accordion-content {
+            max-height: 500px;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(0, 102, 204, 0.1));
+            border-radius: 20px;
+            margin: 4rem 0;
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-secondary {
+            padding: 1rem 2.5rem;
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .cta-secondary:hover {
+            background: var(--primary);
+            color: var(--dark-bg);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 3rem 2rem;
+            border-top: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: var(--text);
+            text-decoration: none;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 2rem auto 0;
+            padding-top: 2rem;
+            border-top: 1px solid var(--grid);
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        .author {
+            margin-top: 1rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .chart-wrapper {
+                height: 300px;
+            }
+
+            .sub-chart-wrapper {
+                height: 200px;
+            }
+
+            .table-container {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 0.5rem;
+            }
+
+            .kpi-value {
+                font-size: 1.5rem;
+            }
+
+            .cta-section h2 {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* Custom Tooltip */
+        #chartTooltip {
+            position: absolute;
+            background: rgba(10, 14, 39, 0.95);
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            padding: 1rem;
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+            min-width: 250px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .tooltip-header {
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: var(--primary);
+            border-bottom: 1px solid rgba(0, 217, 255, 0.3);
+            padding-bottom: 0.5rem;
+        }
+
+        .tooltip-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .tooltip-label {
+            opacity: 0.8;
+        }
+
+        .tooltip-value {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="logo">Carteira de Investimentos</div>
+            <h1>GTA da Madrugada</h1>
+            <p class="subtitle">Estratégia Mono Ativa de Moderado/Alto Risco</p>
+            <p class="tagline">O objetivo central é maximizar uma carteira monoativa utilizando 'Buy the Dip' com aportes e alavancagem proporcional à queda do ativo</p>
+            <a href="#dashboard" class="cta-button">Conhecer Resultados</a>
+        </div>
+    </section>
+
+    <!-- Main Dashboard -->
+    <div class="container">
+        <section id="dashboard" class="section">
+            <h2 class="section-title">Performance da Carteira</h2>
+            <p class="section-description">Evolução patrimonial nos últimos 12 meses - dados atualizados em dias úteis no fechamento do pregão</p>
+            <div class="chart-container">
+                <div class="chart-wrapper">
+                    <canvas id="mainChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Sub Charts -->
+            <div class="sub-charts">
+                <div class="sub-chart-container">
+                    <h3>Carteira vs NASD11</h3>
+                    <div class="sub-chart-wrapper">
+                        <canvas id="chart1"></canvas>
+                    </div>
+                </div>
+                <div class="sub-chart-container">
+                    <h3>Carteira vs IBOV</h3>
+                    <div class="sub-chart-wrapper">
+                        <canvas id="chart2"></canvas>
+                    </div>
+                </div>
+                <div class="sub-chart-container">
+                    <h3>Carteira vs CDI</h3>
+                    <div class="sub-chart-wrapper">
+                        <canvas id="chart3"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- KPIs -->
+        <section class="section">
+            <h2 class="section-title">Métricas Principais</h2>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Retorno Total</div>
+                    <div class="kpi-value positive">-3,2%</div>
+                    <div class="kpi-trend positive">↗ Performance Histórica</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Retorno Anual</div>
+                    <div class="kpi-value positive">-3,2% a.a.</div>
+                    <div class="kpi-trend positive">↗ Acima do mercado</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Drawdown Máximo Histórico</div>
+                    <div class="kpi-value warning">-3,2%</div>
+                    <div class="kpi-trend">Controlado</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Taxa de Sucesso</div>
+                    <div class="kpi-value positive">25,0%</div>
+                    <div class="kpi-trend positive">↗ 1 de 4 dias positivos</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Alavancagem Atual</div>
+                    <div class="kpi-value">1.00x</div>
+                    <div class="kpi-trend">Moderada e segura</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Aporte Inicial</div>
+                    <div class="kpi-value">R$ 4.149,46</div>
+                    <div class="kpi-trend">Último Aporte</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Capital Total</div>
+                    <div class="kpi-value">R$ 4.014,64</div>
+                    <div class="kpi-trend">Evolução Patrimonial</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Table -->
+        <section class="section">
+            <h2 class="section-title">Histórico de Aportes e Alavancagem</h2>
+            <div class="table-container">
+                <table id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>N°</th>
+                            <th>Data</th>
+                            <th>Aporte (R$)</th>
+                            <th>Alavancagem</th>
+                            <th>Valor Alavancado</th>
+                            <th>Preço Médio</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Info Cards -->
+        <section class="section">
+            <h2 class="section-title">Informações da Carteira</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>Composição</h3>
+                    <div class="info-item">
+                        <span>Ativo Principal</span>
+                        <strong>NASD11</strong>
+                    </div>
+                    <div class="info-item">
+                        <span>Concentração</span>
+                        <strong>100%</strong>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%">100% NASD11</div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>Estatísticas</h3>
+                    <div class="info-item">
+                        <span>Período de Gestão</span>
+                        <strong>4 dias</strong>
+                    </div>
+                    <div class="info-item">
+                        <span>Ciclos Alavancados</span>
+                        <strong>0</strong>
+                    </div>
+                    <div class="info-item">
+                        <span>Ciclos Normais</span>
+                        <strong>4</strong>
+                    </div>
+                    <div class="info-item">
+                        <span>Realizações de Lucro</span>
+                        <strong>0</strong>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>Risco de Margem</h3>
+                    <div class="info-item">
+                        <span>Margem Utilizada</span>
+                        <strong class="positive">19.92%</strong>
+                    </div>
+                    <div class="info-item">
+                        <span>Limite Seguro</span>
+                        <strong>170%</strong>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 19.92%"></div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>Próximos Passos</h3>
+                    <div class="info-item">
+                        <span>Próximo Rebalanceamento</span>
+                        <strong>Nov/2025</strong>
+                    </div>
+                    <div class="info-item">
+                        <span>Preço-alvo Alavancagem</span>
+                        <strong>R$ 17.22 - 24 cotas</strong>
+                    </div>
+                    <div class="info-item">
+                        <span>Preço de Realização</span>
+                        <strong>R$ 19.58</strong>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Educational -->
+        <section class="section">
+            <h2 class="section-title">Fundamentos da Estratégia</h2>
+            <div class="accordion">
+                <div class="accordion-item active">
+                    <div class="accordion-header" onclick="toggleAccordion(0)">
+                        <h3>O que é NASD11?</h3>
+                        <span class="accordion-icon">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-content-inner">
+                            O NASD11 é um ETF que replica o índice Nasdaq-100, composto pelas 100 maiores empresas não-financeiras da bolsa americana. Investe 95% em cotas do QQQ. FAAMGs representam 40%+ do índice, oferecendo grande segurança e volatilidade para lucrar com dips.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(1)">
+                        <h3>Como Funciona a Estratégia?</h3>
+                        <span class="accordion-icon">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-content-inner">
+                            Aporte regulares com alavancagem proporcional às quedas. Quando NASD11 cai X%, você usa alavancagem para comprar mais cotas a preços menores. Realiza lucro quando retorna ao preço médio anterior. Combina DCA + Buy The Dip + Alavancagem.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(2)">
+                        <h3>Riscos da Alavancagem</h3>
+                        <span class="accordion-icon">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-content-inner">
+                            <strong style="color: var(--accent);">ATENÇÃO:</strong> Amplificação de perdas, volatility decay em mercados laterais, chamadas de margem, custos de alavancagem. Máximo recomendado: 170% de exposição. Comece com alavancagem mínima (1,1x-1,5x) apenas em ativo que pode perder completamente.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(3)">
+                        <h3>Histórico de Performance</h3>
+                        <span class="accordion-icon">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-content-inner">
+                            NASD11 em 2024: +59,84%. Em 2022: -36,78%. Esta estratégia funciona melhor em mercados com quedas seguidas de recuperações rápidas. Não recomendada para mercados laterais prolongados.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(4)">
+                        <h3>Documentação Completa</h3>
+                        <span class="accordion-icon">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-content-inner">
+                            Acesse a documentação técnica completa com todas as fórmulas, exemplos e considerações de risco. Autor: Adriel de Oliveira Pelegrino.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Carteira GTA da Madrugada</h3>
+                <p>Estratégia alavancada inteligente focada em maximizar retornos através de aportes proporcionais às quedas do mercado.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#dashboard">Dashboard</a></li>
+                    <li><a href="#">Estratégia</a></li>
+                    <li><a href="#">Riscos</a></li>
+                    <li><a href="#">Contato</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Informações</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Privacidade</a></li>
+                    <li><a href="#">Termos de Uso</a></li>
+                    <li><a href="#">Disclaimers</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Carteira GTA da Madrugada. Todos os direitos reservados.</p>
+            <p class="author">Gestor da Carteira: Adriel de Oliveira Pelegrino</p>
+        </div>
+    </footer>
+
+    <script>
+        // Data
+        const monthsData = [
+            // Cotas Iniais - 214
+            {month: 1, date: "2025-11-03", portfolio_price: 19.39, nasd11_price: 19.39, ibov_price: 150454.24, cdi_rate: 0.059, contribution: 4149.46, leverage: 1.0, avg_price: 19.39, status: "inicial"},
+            {month: 2, date: "2025-11-04", portfolio_price: 19.16, nasd11_price: 19.16, ibov_price: 150704.20, cdi_rate: 0.059, contribution: 0.0001, leverage: 1.0, avg_price: 19.16, status: "crescimento"},
+            {month: 3, date: "2025-11-05", portfolio_price: 19.11, nasd11_price: 19.11, ibov_price: 153294.44, cdi_rate: 0.059, contribution: 0.0001, leverage: 1.0, avg_price: 19.11, status: "crescimento"},
+            {month: 4, date: "2025-11-06", portfolio_price: 18.76, nasd11_price: 18.76, ibov_price: 153338.63, cdi_rate: 0.059, contribution: 0.0001, leverage: 1.0, avg_price: 18.76, status: "crescimento"},
+            
+            //{month: 2, date: "2025-11", portfolio_price: 17.00, nasd11_price: 17.20, ibov_price: 123.500, cdi_rate: 0.72, contribution: 230, leverage: 1.0, avg_price: 16.00, status: "crescimento"},
+            //{month: 3, date: "2025-01", portfolio_price: 11500, nasd11_price: 18.10, ibov_price: 125200, cdi_rate: 0.68, contribution: 1000, leverage: 1.0, avg_price: 16.05, status: "crescimento"},
+            //{month: 4, date: "2025-02", portfolio_price: 9850, nasd11_price: 15.35, ibov_price: 119800, cdi_rate: 0.75, contribution: 1000, leverage: 1.15, avg_price: 15.60, status: "queda_alavancada"},
+            //{month: 5, date: "2025-03", portfolio_price: 11200, nasd11_price: 17.80, ibov_price: 122500, cdi_rate: 0.70, contribution: 0, leverage: 1.0, avg_price: 15.55, status: "recuperacao"},
+            //{month: 6, date: "2025-04", portfolio_price: 12100, nasd11_price: 19.20, ibov_price: 126300, cdi_rate: 0.65, contribution: 1000, leverage: 1.0, avg_price: 15.50, status: "crescimento"},
+            //{month: 7, date: "2025-05", portfolio_price: 10500, nasd11_price: 16.80, ibov_price: 121000, cdi_rate: 0.72, contribution: 1000, leverage: 1.20, avg_price: 15.80, status: "queda_alavancada"},
+            //{month: 8, date: "2025-06", portfolio_price: 13200, nasd11_price: 21.00, ibov_price: 128500, cdi_rate: 0.60, contribution: 0, leverage: 1.0, avg_price: 15.75, status: "recuperacao_forte"},
+            //{month: 9, date: "2025-07", portfolio_price: 14100, nasd11_price: 22.50, ibov_price: 131200, cdi_rate: 0.58, contribution: 1000, leverage: 1.0, avg_price: 15.70, status: "crescimento"},
+            //{month: 10, date: "2025-08", portfolio_price: 12800, nasd11_price: 20.40, ibov_price: 125800, cdi_rate: 0.65, contribution: 1000, leverage: 1.10, avg_price: 15.95, status: "queda_alavancada"},
+            //{month: 11, date: "2025-09", portfolio_price: 14600, nasd11_price: 23.20, ibov_price: 130500, cdi_rate: 0.62, contribution: 0, leverage: 1.0, avg_price: 15.90, status: "recuperacao"},
+            //{month: 12, date: "2025-10", portfolio_price: 14800, nasd11_price: 23.50, ibov_price: 132100, cdi_rate: 0.61, contribution: 1000, leverage: 1.0, avg_price: 15.88, status: "final"}
+        ];
+
+        // Populate table
+        const tbody = document.getElementById('historyTableBody');
+        monthsData.forEach(data => {
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td>${data.month}</td>
+                <td>${data.date}</td>
+                <td>R$ ${data.contribution.toLocaleString('pt-BR')}</td>
+                <td>${data.leverage.toFixed(2)}x</td>
+                <td>R$ ${(data.contribution * data.leverage).toLocaleString('pt-BR')}</td>
+                <td>R$ ${data.avg_price.toFixed(2)}</td>
+                <td><span class="status-badge status-${data.status.split('_')[0]}">${data.status.replace('_', ' ')}</span></td>
+            `;
+        });
+
+        // Chart configuration
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        color: '#E5E7EB',
+                        font: { size: 12 }
+                    }
+                },
+                tooltip: {
+                    enabled: false
+                }
+            },
+            scales: {
+                y: {
+                    grid: { color: 'rgba(31, 41, 55, 0.5)' },
+                    ticks: { color: '#E5E7EB' }
+                },
+                x: {
+                    grid: { color: 'rgba(31, 41, 55, 0.3)' },
+                    ticks: { color: '#E5E7EB' }
+                }
+            }
+        };
+
+        const labels = monthsData.map(d => d.date);
+
+        // Main Chart with custom tooltip
+        const mainCtx = document.getElementById('mainChart').getContext('2d');
+        const mainChart = new Chart(mainCtx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Carteira',
+                    data: monthsData.map(d => d.portfolio_price),
+                    borderColor: '#00D9FF',
+                    backgroundColor: 'rgba(0, 217, 255, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                ...chartOptions,
+                onHover: (event, activeElements) => {
+                    const tooltip = document.getElementById('chartTooltip') || createTooltip();
+                    
+                    if (activeElements.length > 0) {
+                        const index = activeElements[0].index;
+                        const data = monthsData[index];
+                        
+                        tooltip.style.display = 'block';
+                        tooltip.style.left = event.native.pageX + 15 + 'px';
+                        tooltip.style.top = event.native.pageY - 100 + 'px';
+                        
+                        tooltip.innerHTML = `
+                            <div class="tooltip-header">${data.date}</div>
+                            <div class="tooltip-row">
+                                <span class="tooltip-label" style="color: #00D9FF;">Carteira:</span>
+                                <span class="tooltip-value" style="color: #00D9FF;">R$ ${data.portfolio_price.toLocaleString('pt-BR')}</span>
+                            </div>
+                            <div class="tooltip-row">
+                                <span class="tooltip-label" style="color: #0066CC;">NASD11:</span>
+                                <span class="tooltip-value" style="color: #0066CC;">R$ ${data.nasd11_price.toFixed(2)}</span>
+                            </div>
+                            <div class="tooltip-row">
+                                <span class="tooltip-label" style="color: #10B981;">IBOV:</span>
+                                <span class="tooltip-value" style="color: #10B981;">${data.ibov_price.toLocaleString('pt-BR')} pts</span>
+                            </div>
+                            <div class="tooltip-row">
+                                <span class="tooltip-label" style="color: #8B5CF6;">CDI:</span>
+                                <span class="tooltip-value" style="color: #8B5CF6;">${data.cdi_rate.toFixed(2)}%</span>
+                            </div>
+                        `;
+                    } else {
+                        tooltip.style.display = 'none';
+                    }
+                }
+            }
+        });
+
+        function createTooltip() {
+            const tooltip = document.createElement('div');
+            tooltip.id = 'chartTooltip';
+            document.body.appendChild(tooltip);
+            return tooltip;
+        }
+
+        // Sub Chart 1: Carteira vs NASD11
+        const chart1Ctx = document.getElementById('chart1').getContext('2d');
+        const normalizedNasd = monthsData.map((d, i) => (d.nasd11_price / monthsData[0].nasd11_price) * 10000);
+        new Chart(chart1Ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+            
+                    {
+                        label: 'NASD11',
+                        data: normalizedNasd,
+                        borderColor: '#0066CC',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: chartOptions
+        });
+
+        // Sub Chart 2: Carteira vs IBOV
+        const chart2Ctx = document.getElementById('chart2').getContext('2d');
+        const normalizedIbov = monthsData.map((d, i) => (d.ibov_price / monthsData[0].ibov_price) * 10000);
+        new Chart(chart2Ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+
+                    {
+                        label: 'IBOV',
+                        data: normalizedIbov,
+                        borderColor: '#10B981',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: chartOptions
+        });
+
+        // Sub Chart 3: Carteira vs CDI
+        const chart3Ctx = document.getElementById('chart3').getContext('2d');
+        const cdiAccumulated = monthsData.map((d, i) => {
+            let accumulated = 10000;
+            for (let j = 0; j <= i; j++) {
+                accumulated *= (1 + monthsData[j].cdi_rate / 100);
+            }
+            return accumulated;
+        });
+        new Chart(chart3Ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                
+                    {
+                        label: 'CDI',
+                        data: cdiAccumulated,
+                        borderColor: '#8B5CF6',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: chartOptions
+        });
+
+        // Accordion functionality
+        function toggleAccordion(index) {
+            const items = document.querySelectorAll('.accordion-item');
+            const item = items[index];
+            const isActive = item.classList.contains('active');
+            
+            items.forEach(i => i.classList.remove('active'));
+            
+            if (!isActive) {
+                item.classList.add('active');
+            }
+        }
+
+        // Simulator
+        const dropSlider = document.getElementById('dropSlider');
+        const leverageSlider = document.getElementById('leverageSlider');
+        const contributionSlider = document.getElementById('contributionSlider');
+        
+        const dropValue = document.getElementById('dropValue');
+        const leverageValue = document.getElementById('leverageValue');
+        const contributionValue = document.getElementById('contributionValue');
+        
+        const quotasResult = document.getElementById('quotasResult');
+        const avgPriceResult = document.getElementById('avgPriceResult');
+        const profitResult = document.getElementById('profitResult');
+        const returnResult = document.getElementById('returnResult');
+
+        function updateSimulator() {
+            const drop = parseInt(dropSlider.value);
+            const leverage = parseFloat(leverageSlider.value);
+            const contribution = parseInt(contributionSlider.value);
+            
+            dropValue.textContent = `-${drop}`;
+            leverageValue.textContent = leverage.toFixed(1);
+            contributionValue.textContent = contribution.toLocaleString('pt-BR');
+            
+            const currentPrice = 20.00;
+            const newPrice = currentPrice * (1 - drop / 100);
+            const totalInvestment = contribution * leverage;
+            const quotas = totalInvestment / newPrice;
+            const targetPrice = 23.50;
+            const profit = (targetPrice - newPrice) * quotas - contribution * (leverage - 1);
+            const returnPercent = (profit / contribution) * 100;
+            
+            quotasResult.textContent = quotas.toFixed(1);
+            avgPriceResult.textContent = `R$ ${newPrice.toFixed(2)}`;
+            profitResult.textContent = `R$ ${profit.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+            returnResult.textContent = `${returnPercent.toFixed(1)}%`;
+            
+            profitResult.className = profit > 0 ? 'result-value positive' : 'result-value negative';
+            returnResult.className = returnPercent > 0 ? 'result-value positive' : 'result-value negative';
+        }
+
+        dropSlider.addEventListener('input', updateSimulator);
+        leverageSlider.addEventListener('input', updateSimulator);
+        contributionSlider.addEventListener('input', updateSimulator);
+        
+        updateSimulator();
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
